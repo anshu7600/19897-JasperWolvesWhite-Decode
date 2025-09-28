@@ -38,9 +38,9 @@ public class FieldRelativeMecanumDrive {
         imu = hardwareMap.get(IMU.class, "imu");
         //TODO: Needs to mach the orientation on the robot
         RevHubOrientationOnRobot.LogoFacingDirection logoDirection =
-                RevHubOrientationOnRobot.LogoFacingDirection.UP; // Which way the logo is facing for us it is to the sides
+                RevHubOrientationOnRobot.LogoFacingDirection.RIGHT; // Which way the logo is facing for us it is to the sides
         RevHubOrientationOnRobot.UsbFacingDirection usbDirection =
-                RevHubOrientationOnRobot.UsbFacingDirection.FORWARD; // Which direction is the usb facing
+                RevHubOrientationOnRobot.UsbFacingDirection.UP; // Which direction is the usb facing
 
         RevHubOrientationOnRobot orientationOnRobot = new
                 RevHubOrientationOnRobot(logoDirection, usbDirection);
