@@ -35,7 +35,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 
 @TeleOp(name = "ActualFinalTeleOP", group = "TeleOp")
-public class TeleOpFieldOrientated extends OpMode {
+public class TeleOP extends OpMode {
     // Define motors for driving
     private DcMotor frontLeft;
     private DcMotor frontRight;

@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.pedroPathing;
 
+import com.pedropathing.control.PIDFCoefficients;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.follower.FollowerConstants;
 import com.pedropathing.ftc.FollowerBuilder;
@@ -14,23 +15,29 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class Constants {
     public static FollowerConstants followerConstants = new FollowerConstants()
-            .mass(5);
+            .mass(10.5)
+            .forwardZeroPowerAcceleration(-27)
+            .lateralZeroPowerAcceleration(-68)
+            .translationalPIDFCoefficients(new PIDFCoefficients(.087, 0, 0.005, 0))
+            .headingPIDFCoefficients(new PIDFCoefficients(.9, 0, .05, .01))
+            .centripetalScaling(.0004)
+
+            ;
+    ;
     public static TwoWheelConstants localizerConstants = new TwoWheelConstants()
             .IMU_HardwareMapName("imu")
-            .forwardEncoder_HardwareMapName("imu2")
-            .strafeEncoder_HardwareMapName("imu1")
-
+            .forwardEncoder_HardwareMapName("backRight")
+            .strafeEncoder_HardwareMapName("backLeft")
 //            TODO: Find these values
 //            .forwardPodY()
 //            .strafePodX()
-//            TODO: One of these or both may need to be uncommented based on the Localization Test
-//            .forwardEncoderDirection(Encoder.REVERSE)
-//            .strafeEncoderDirection(Encoder.REVERSE)
-//            TODO: Get this value from Forward Tuner (Run the test many times and average results)
-//            .forwardTicksToInches()
-//            TODO: Same as the previous one except it is sideways
-//            .strafeTicksToInches()
-//            TODO: Make sure this is correct
+
+            .forwardEncoderDirection(Encoder.REVERSE)
+            .strafeEncoderDirection(Encoder.REVERSE)
+
+            .forwardTicksToInches((.00296459 + .0029584 + .0029599 + .0029611)/4)
+            .strafeTicksToInches((.0029588 + .002951 + .002951 + .002914)/4)
+
             .IMU_Orientation(
                     new RevHubOrientationOnRobot(
                             RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,
@@ -49,18 +56,16 @@ public class Constants {
             .rightFrontMotorDirection(DcMotorSimple.Direction.FORWARD)
             .rightRearMotorDirection(DcMotorSimple.Direction.FORWARD)
 //            TODO: Get this with Forward Velocity Tuner
-//            .xVelocity()
-//            TODO: Get this with Lateral Velocity Tuner
-//            .yVelocity()
-//            TODO: Get this with Forward Zero Power Acceleration
-//            .forwardZeroPowerAcceleration()
-//            TODO: Get this with Lateral Zero Power Acceleration
-//            .lateralZeroPowerAcceleration()
+            .xVelocity(59.6)
+////            TODO: Get this with Lateral Velocity Tuner
+            .yVelocity(83.1)
             ;
 
 
 
-    public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1, 1);
+    public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1.3, 1.5);
+
+
 
     public static Follower createFollower(HardwareMap hardwareMap) {
         return new FollowerBuilder(followerConstants, hardwareMap)
@@ -69,7 +74,4 @@ public class Constants {
                 .mecanumDrivetrain(driveConstants)
                 .build();
     }
-
-
-
 }
