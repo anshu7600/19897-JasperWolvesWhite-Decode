@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode;
 
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierCurve;
-import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathBuilder;
 import com.pedropathing.paths.PathChain;
@@ -42,8 +41,8 @@ public class QPath extends OpMode {
                 .setTangentHeadingInterpolation()
                 .build();
 
-        start = new Pose(72, 8, Math.toRadians(90));
-        end = new Pose(22, 35.5, Math.toRadians(180));
+        start = new Pose(22, 35.5, Math.toRadians(180));
+        end = new Pose(72, 24, Math.toRadians(124.5));
 
         // Generate control points
         splinePoints = QuinticSplineGenerator.generateSpline(start, end);
@@ -56,8 +55,8 @@ public class QPath extends OpMode {
                 .setTangentHeadingInterpolation()
                 .build();
 
-        start = new Pose(72, 8, Math.toRadians(90));
-        end = new Pose(22, 35.5, Math.toRadians(180));
+        start = new Pose(72, 24, Math.toRadians(124.5));
+        end = new Pose(22, 59.5, Math.toRadians(180));
 
         // Generate control points
         splinePoints = QuinticSplineGenerator.generateSpline(start, end);
@@ -70,8 +69,8 @@ public class QPath extends OpMode {
                 .setTangentHeadingInterpolation()
                 .build();
 
-        start = new Pose(72, 8, Math.toRadians(90));
-        end = new Pose(22, 35.5, Math.toRadians(180));
+        start = new Pose(22, 59.5, Math.toRadians(180));
+        end = new Pose(72, 72, Math.toRadians(134));
 
         // Generate control points
         splinePoints = QuinticSplineGenerator.generateSpline(start, end);
@@ -84,8 +83,8 @@ public class QPath extends OpMode {
                 .setTangentHeadingInterpolation()
                 .build();
 
-        start = new Pose(72, 8, Math.toRadians(90));
-        end = new Pose(22, 35.5, Math.toRadians(180));
+        start = new Pose(72, 72, Math.toRadians(134));
+        end = new Pose(22, 84, Math.toRadians(180));
 
         // Generate control points
         splinePoints = QuinticSplineGenerator.generateSpline(start, end);
@@ -98,8 +97,8 @@ public class QPath extends OpMode {
                 .setTangentHeadingInterpolation()
                 .build();
 
-        start = new Pose(72, 8, Math.toRadians(90));
-        end = new Pose(22, 35.5, Math.toRadians(180));
+        start = new Pose(22, 84, Math.toRadians(180));
+        end = new Pose(72, 72, Math.toRadians(134));
 
         // Generate control points
         splinePoints = QuinticSplineGenerator.generateSpline(start, end);
@@ -112,8 +111,8 @@ public class QPath extends OpMode {
                 .setTangentHeadingInterpolation()
                 .build();
 
-        start = new Pose(72, 8, Math.toRadians(90));
-        end = new Pose(22, 35.5, Math.toRadians(180));
+        start = new Pose(72, 72, Math.toRadians(134));
+        end = new Pose(10, 7.5, Math.toRadians(180));
 
         // Generate control points
         splinePoints = QuinticSplineGenerator.generateSpline(start, end);
