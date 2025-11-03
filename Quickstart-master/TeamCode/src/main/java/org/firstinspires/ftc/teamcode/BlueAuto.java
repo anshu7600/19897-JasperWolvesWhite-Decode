@@ -30,31 +30,28 @@ public class BlueAuto extends OpMode {
                 .addPath(
                         new BezierCurve(
                                 new Pose(56.000, 8.000),
-                                new Pose(56.000, 23.000),
-                                new Pose(50.056, 35.585),
-                                new Pose(22.000, 35.500)
+                                new Pose(56.299, 35.888),
+                                new Pose(24.000, 35.840)
                         )
+
                 )
                 .setTangentHeadingInterpolation()
                 .build();
 
         PathChain path2 = builder
                 .addPath(
-                        new BezierLine(new Pose(22.000, 35.500), new Pose(72.000, 24.000))
+                        new BezierLine(new Pose(24.000, 35.840), new Pose(72.000, 24.000))
                 )
-                .setLinearHeadingInterpolation(
-                        Math.toRadians(180),
-                        Math.toRadians(124.5)
-                )
+                .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(125))
                 .build();
 
         PathChain path3 = builder
                 .addPath(
                         new BezierCurve(
                                 new Pose(72.000, 24.000),
-                                new Pose(48.633, 56.936),
-                                new Pose(32.264, 59.545),
-                                new Pose(22.000, 59.500)
+                                new Pose(61.009, 39.701),
+                                new Pose(36.336, 59.888),
+                                new Pose(24.000, 60.000)
                         )
                 )
                 .setTangentHeadingInterpolation()
@@ -62,38 +59,44 @@ public class BlueAuto extends OpMode {
 
         PathChain path4 = builder
                 .addPath(
-                        new BezierLine(new Pose(22.000, 59.500), new Pose(72.000, 72.000))
+                        new BezierCurve(
+                                new Pose(24.000, 60.000),
+                                new Pose(36.336, 59.888),
+                                new Pose(61.009, 39.701),
+                                new Pose(72.000, 24.000)
+                        )
                 )
-                .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(134))
+                .setTangentHeadingInterpolation()
+                .setReversed()
                 .build();
 
         PathChain path5 = builder
                 .addPath(
-                        new BezierLine(new Pose(72.000, 72.000), new Pose(22.000, 84.000))
+                        new BezierCurve(
+                                new Pose(72.000, 24.000),
+                                new Pose(49.000, 88.000),
+                                new Pose(24.000, 84.000)
+                        )
                 )
-                .setLinearHeadingInterpolation(Math.toRadians(134), Math.toRadians(180))
+                .setLinearHeadingInterpolation(Math.toRadians(125), Math.toRadians(180))
                 .build();
 
         PathChain path6 = builder
                 .addPath(
-                        new BezierLine(new Pose(22.000, 84.000), new Pose(72.000, 72.000))
+                        new BezierCurve(
+                                new Pose(24.000, 84.000),
+                                new Pose(49.000, 88.000),
+                                new Pose(72.000, 24.000)
+                        )
                 )
-                .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(134))
+                .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(125))
                 .build();
 
         PathChain path7 = builder
                 .addPath(
-                        new BezierCurve(
-                                new Pose(72.000, 72.000),
-                                new Pose(59.071, 86.590),
-                                new Pose(17.081, 110.313),
-                                new Pose(54.801, 35.110),
-                                new Pose(36.771, 17.081),
-                                new Pose(18.979, 7.829),
-                                new Pose(9.964, 7.591)
-                        )
+                        new BezierLine(new Pose(72.000, 24.000), new Pose(15.000, 10.000))
                 )
-                .setTangentHeadingInterpolation()
+                .setLinearHeadingInterpolation(Math.toRadians(125), Math.toRadians(180))
                 .build();
 
         paths = new PathChain[]{path1, path2, path3, path4, path5, path6, path7};
