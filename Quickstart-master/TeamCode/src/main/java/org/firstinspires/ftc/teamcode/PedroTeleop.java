@@ -1,71 +1,82 @@
 package org.firstinspires.ftc.teamcode;
-import com.bylazar.configurables.annotations.Configurable;
-import com.bylazar.telemetry.PanelsTelemetry;
-import com.bylazar.telemetry.TelemetryManager;
 import com.pedropathing.follower.Follower;
-import com.pedropathing.geometry.BezierLine;
-import com.pedropathing.geometry.Pose;
-import com.pedropathing.paths.HeadingInterpolator;
-import com.pedropathing.paths.Path;
-import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-
-import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
-
-import java.util.function.Supplier;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 @TeleOp(name = "Pedro Teleop", group = "TeleOp")
 public class PedroTeleop extends OpMode {
     private Follower follower;
-    public static Pose startingPose;
-    private boolean automatedDrive = false;
-    private Supplier<PathChain> pathChain;
-    private boolean robotCentricDrive = true;
+    private DcMotorEx outtakeLeft, outtakeRight;
+    private DcMotor intake;
+
+    double targetRPM = 4267;
+    private double ticksPerRev;
 
     @Override
     public void init() {
-        follower = Constants.createFollower(hardwareMap);
-        follower.setStartingPose(startingPose == null ? new Pose() : startingPose);
-        follower.update();
+        outtakeLeft = hardwareMap.get(DcMotorEx.class, "outtakeLeft");
+        outtakeRight = hardwareMap.get(DcMotorEx.class, "outtakeRight");
+        intake = hardwareMap.get(DcMotor.class, "intake");
 
-        pathChain = () -> follower.pathBuilder() //Lazy Curve Generation
-                .addPath(new Path(new BezierLine(follower::getPose, new Pose(20, 30))))
-                .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(45), 0.8))
-                .build();
+        outtakeLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        outtakeRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        outtakeLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        outtakeRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
     @Override
     public void start() {
         follower.startTeleopDrive(true);
+        ticksPerRev = outtakeLeft.getMotorType().getTicksPerRev();
     }
 
     @Override
     public void loop() {
         follower.update();
-        if (gamepad1.right_bumper) {
-            robotCentricDrive =! robotCentricDrive;
+
+        double targetTicksPerSec = targetRPM * ticksPerRev / 60.0;
+
+        if (gamepad2.right_bumper) {
+            outtakeLeft.setVelocity(targetTicksPerSec);
+            outtakeRight.setVelocity(-targetTicksPerSec);
+        } else if (gamepad2.right_trigger > 0) {
+            outtakeLeft.setVelocity(-targetTicksPerSec);
+            outtakeRight.setVelocity(targetTicksPerSec);
+        } else {
+            outtakeLeft.setVelocity(0);
+            outtakeRight.setVelocity(0);
         }
-        if (!automatedDrive) {
-            follower.setTeleOpDrive(
-                    -gamepad1.left_stick_y,
-                    -gamepad1.left_stick_x,
-                    -gamepad1.right_stick_x,
-                    robotCentricDrive
-            );
+
+        if (gamepad2.left_bumper) {
+            intake.setPower(.95);
+        } else if (gamepad2.left_trigger > 0) {
+            intake.setPower(-.95);
         }
-        //Automated PathFollowing
-        if (gamepad1.aWasPressed()) {
-            follower.followPath(pathChain.get());
-            automatedDrive = true;
+
+        if (gamepad1.right_trigger > 0) {
+            targetRPM = targetRPM + 100;
+        } else if (gamepad1.left_trigger > 0) {
+            targetRPM = targetRPM - 100;
         }
-        //Stop automated following if the follower is done
-        if (automatedDrive && (gamepad1.bWasPressed() || !follower.isBusy())) {
-            follower.startTeleopDrive();
-            automatedDrive = false;
-        }
-        telemetry.addData("position", follower.getPose());
-        telemetry.addData("velocity", follower.getVelocity());
-        telemetry.addData("automatedDrive", automatedDrive);
+
+        follower.setTeleOpDrive(
+                -gamepad1.left_stick_y,
+                -gamepad1.left_stick_x,
+                -gamepad1.right_stick_x,
+                true);
+
+        updateTelemetry();
+    }
+
+    public void updateTelemetry() {
+        telemetry.addData("Current target RPM ", targetRPM);
+        telemetry.addData("Left RPM ", outtakeLeft.getVelocity() * 60 / ticksPerRev);
+        telemetry.addData("Right RPM ", outtakeRight.getVelocity() * 60 / ticksPerRev);
+        telemetry.addData("Position ", follower.getPose());
+        telemetry.addData("Velocity ", follower.getVelocity());
     }
 }
