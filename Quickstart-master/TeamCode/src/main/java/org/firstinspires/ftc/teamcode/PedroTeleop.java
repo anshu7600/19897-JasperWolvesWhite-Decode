@@ -13,6 +13,7 @@ public class PedroTeleop extends OpMode {
 
     double targetRPM = 4267;
     private double ticksPerRev;
+    private boolean rumbleTriggered = false;
 
     @Override
     public void init() {
@@ -40,15 +41,27 @@ public class PedroTeleop extends OpMode {
 
         double targetTicksPerSec = targetRPM * ticksPerRev / 60.0;
 
+
+
         if (gamepad2.right_bumper) {
             outtakeLeft.setVelocity(targetTicksPerSec);
             outtakeRight.setVelocity(-targetTicksPerSec);
         } else if (gamepad2.right_trigger > 0) {
-            outtakeLeft.setVelocity(-targetTicksPerSec);
-            outtakeRight.setVelocity(targetTicksPerSec);
+            outtakeLeft.setPower(-.5);
+            outtakeRight.setVelocity(.5);
         } else {
             outtakeLeft.setVelocity(0);
             outtakeRight.setVelocity(0);
+        }
+
+        double leftRPM = Math.abs(outtakeLeft.getVelocity() * 60 / ticksPerRev);
+        double rightRPM = Math.abs(outtakeRight.getVelocity() * 60 / ticksPerRev);
+        boolean ready = Math.abs(leftRPM - targetRPM) < 100 && Math.abs(rightRPM - targetRPM) < 100;
+        if (ready && !rumbleTriggered) {
+            gamepad2.rumble(500);
+            rumbleTriggered = true;
+        } else if (!ready) {
+            rumbleTriggered = false;
         }
 
         if (gamepad2.left_bumper) {
@@ -57,9 +70,9 @@ public class PedroTeleop extends OpMode {
             intake.setPower(-.95);
         }
 
-        if (gamepad1.right_trigger > 0) {
+        if (gamepad1.right_trigger > .5) {
             targetRPM = targetRPM + 100;
-        } else if (gamepad1.left_trigger > 0) {
+        } else if (gamepad1.left_trigger > .5) {
             targetRPM = targetRPM - 100;
         }
 
