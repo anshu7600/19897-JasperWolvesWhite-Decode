@@ -4,12 +4,17 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.Servo;
 
 @TeleOp(name = "Pedro Teleop", group = "TeleOp")
 public class PedroTeleop extends OpMode {
     private Follower follower;
     private DcMotorEx outtakeLeft, outtakeRight;
     private DcMotor intake;
+    private DcMotor frontLeft;
+    private DcMotor frontRight;
+    private DcMotor backLeft;
+    private DcMotor backRight;
 
     double targetRPM = 4267;
     private double ticksPerRev;
@@ -26,22 +31,33 @@ public class PedroTeleop extends OpMode {
         outtakeLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         outtakeRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
+        frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");
+        frontRight = hardwareMap.get(DcMotor.class, "frontRight");
+        backLeft = hardwareMap.get(DcMotor.class, "backLeft");
+        backRight = hardwareMap.get(DcMotor.class, "backRight");
+
+        // Reverse left motors for proper directionality
+        frontLeft.setDirection(DcMotor.Direction.REVERSE);
+        backLeft.setDirection(DcMotor.Direction.REVERSE);
+
+        frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
     @Override
     public void start() {
-        follower.startTeleopDrive(true);
+//        follower.startTeleopDrive(true);
         ticksPerRev = outtakeLeft.getMotorType().getTicksPerRev();
     }
 
     @Override
     public void loop() {
-        follower.update();
+//        follower.update();
 
         double targetTicksPerSec = targetRPM * ticksPerRev / 60.0;
-
-
 
         if (gamepad2.right_bumper) {
             outtakeLeft.setVelocity(targetTicksPerSec);
@@ -76,12 +92,12 @@ public class PedroTeleop extends OpMode {
             targetRPM = targetRPM - 100;
         }
 
-        follower.setTeleOpDrive(
-                -gamepad1.left_stick_y,
-                -gamepad1.left_stick_x,
-                -gamepad1.right_stick_x,
-                true);
-
+//        follower.setTeleOpDrive(
+//                -gamepad1.left_stick_y,
+//                -gamepad1.left_stick_x,
+//                -gamepad1.right_stick_x,
+//                true);
+        controlDrivetrain();
         updateTelemetry();
     }
 
@@ -91,5 +107,34 @@ public class PedroTeleop extends OpMode {
         telemetry.addData("Right RPM ", outtakeRight.getVelocity() * 60 / ticksPerRev);
         telemetry.addData("Position ", follower.getPose());
         telemetry.addData("Velocity ", follower.getVelocity());
+    }
+
+    private void controlDrivetrain() {
+        if (gamepad1.dpad_up) SetDrivetrainMotorPowers(.9, .9, .9, .9);
+        else if (gamepad1.dpad_down) SetDrivetrainMotorPowers(-.9, -.9, -.9, -.9);
+        else if (gamepad1.dpad_left) SetDrivetrainMotorPowers(-.9, .9, .9, -.9);
+        else if (gamepad1.dpad_right) SetDrivetrainMotorPowers(.9, -.9, -.9, .9);
+        else {
+            // Default joystick control
+            double y = -gamepad1.left_stick_y;  // Forward/backward
+            double x = gamepad1.left_stick_x * 1.1;  // Strafe
+            double rx = gamepad1.right_stick_x * .6;  // Rotation
+
+
+            // different drive train
+            double frontLeftPower = (y + x + rx) * .9;
+            double frontRightPower = (y - x - rx) * .9;
+            double backLeftPower = (y - x + rx) * .9;
+            double backRightPower = (y + x - rx) * .9;
+
+            SetDrivetrainMotorPowers(frontLeftPower, frontRightPower, backLeftPower, backRightPower);
+        }
+    }
+
+    private void SetDrivetrainMotorPowers(double frontLeftPower, double frontRightPower, double backLeftPower, double backRightPower) {
+        frontLeft.setPower(frontLeftPower);
+        frontRight.setPower(frontRightPower);
+        backLeft.setPower(backLeftPower);
+        backRight.setPower(backRightPower);
     }
 }
