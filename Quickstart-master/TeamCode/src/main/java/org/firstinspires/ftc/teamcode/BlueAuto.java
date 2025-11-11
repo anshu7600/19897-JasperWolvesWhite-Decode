@@ -9,11 +9,26 @@ import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 @Autonomous(name = "Pedro Pathing Autonomous")
 public class BlueAuto extends OpMode {
+
+    private DcMotor frontLeft;
+    private DcMotor frontRight;
+    private DcMotor backLeft;
+    private DcMotor backRight;
+    private Servo shoulderLeft;
+    private Servo shoulderRight;
+    private Servo extendServo;
+
+    private Servo wristLeft;
+    private Servo wristRight;
+    private Servo bottomPivot;
+    private Servo clawServoBottom;
 
     private Follower follower;
     private Timer pathTimer, opmodeTimer;
@@ -36,6 +51,7 @@ public class BlueAuto extends OpMode {
 
                 )
                 .setTangentHeadingInterpolation()
+//                .addParametricCallback()
                 .build();
 
         PathChain path2 = builder
@@ -122,6 +138,25 @@ public class BlueAuto extends OpMode {
 
     @Override
     public void init() {
+        frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");
+        frontRight = hardwareMap.get(DcMotor.class, "frontRight");
+        backLeft = hardwareMap.get(DcMotor.class, "backLeft");
+        backRight = hardwareMap.get(DcMotor.class, "backRight");
+
+        // Reverse left motors for proper directionality
+        frontLeft.setDirection(DcMotor.Direction.REVERSE);
+        backLeft.setDirection(DcMotor.Direction.REVERSE);
+
+        wristRight = hardwareMap.get(Servo.class, "wristRight");
+        wristLeft = hardwareMap.get(Servo.class, "wristLeft");
+        bottomPivot = hardwareMap.get(Servo.class, "bottomPivot");
+        clawServoBottom = hardwareMap.get(Servo.class, "clawServoBottom");
+
+        shoulderLeft = hardwareMap.get(Servo.class, "shoulderLeft");
+        shoulderRight = hardwareMap.get(Servo.class, "shoulderRight");
+
+        extendServo = hardwareMap.get(Servo.class, "extendServo");
+
         pathTimer = new Timer();
         opmodeTimer = new Timer();
         opmodeTimer.resetTimer();
@@ -132,10 +167,13 @@ public class BlueAuto extends OpMode {
     }
 
     @Override
-    public void init_loop() {}
-
-    @Override
     public void start() {
+        retract();
+        startShoulder();
+        upWristBottom();
+        openClawBottom();
+        startPivotBottom();
+        retract();
         opmodeTimer.resetTimer();
         setPathState(0);
     }
@@ -155,4 +193,49 @@ public class BlueAuto extends OpMode {
 
     @Override
     public void stop() {}
+
+    public void retract() {
+        extendServo.setPosition(0);
+    }
+
+    public void extend() {
+        extendServo.setPosition(.56);
+    }
+    public void openClawBottom() {
+        clawServoBottom.setPosition(1-.3578);
+    }
+
+    public void closeClawBottom() {
+        clawServoBottom.setPosition(.9-.7128);
+    }
+
+    public void tightCloseClawBottom() {
+        clawServoBottom.setPosition(.9-.775);
+    }
+
+    public void startPivotBottom () {
+        bottomPivot.setPosition(.0367);
+    }
+
+    public void downWristBottom() {
+        wristRight.setPosition(.9222);
+    }
+
+    public void middleWristBottom() {
+        wristRight.setPosition(.5116);
+    }
+
+    public void scanWristBottom() {
+        wristRight.setPosition(.8733);
+    }
+
+    public void upWristBottom() {
+        wristRight.setPosition(.0978);
+    }
+
+    public void endPivotBottom () {
+        bottomPivot.setPosition(.4033);
+    }
+
+    public void startShoulder() { shoulderLeft.setPosition(.73); }
 }
