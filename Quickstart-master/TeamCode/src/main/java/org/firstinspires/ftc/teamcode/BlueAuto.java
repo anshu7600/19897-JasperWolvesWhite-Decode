@@ -10,25 +10,15 @@ import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 @Autonomous(name = "Pedro Pathing Autonomous")
 public class BlueAuto extends OpMode {
 
-    private DcMotor frontLeft;
-    private DcMotor frontRight;
-    private DcMotor backLeft;
-    private DcMotor backRight;
-    private Servo shoulderLeft;
-    private Servo shoulderRight;
-    private Servo extendServo;
-
-    private Servo wristLeft;
-    private Servo wristRight;
-    private Servo bottomPivot;
-    private Servo clawServoBottom;
+    private DcMotor intakeMotor;
+    private DcMotor outtakeLeft;
+    private DcMotor outtakeRight;
 
     private Follower follower;
     private Timer pathTimer, opmodeTimer;
@@ -51,7 +41,7 @@ public class BlueAuto extends OpMode {
 
                 )
                 .setTangentHeadingInterpolation()
-//                .addParametricCallback()
+                .addParametricCallback(0.5, setIntake(1))
                 .build();
 
         PathChain path2 = builder
@@ -59,6 +49,7 @@ public class BlueAuto extends OpMode {
                         new BezierLine(new Pose(24.000, 35.840), new Pose(72.000, 24.000))
                 )
                 .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(125))
+                .addParametricCallback(0.975, setOuttake(1))
                 .build();
 
         PathChain path3 = builder
@@ -71,6 +62,7 @@ public class BlueAuto extends OpMode {
                         )
                 )
                 .setTangentHeadingInterpolation()
+                .addParametricCallback(0.5, setIntake(1))
                 .build();
 
         PathChain path4 = builder
@@ -84,6 +76,7 @@ public class BlueAuto extends OpMode {
                 )
                 .setTangentHeadingInterpolation()
                 .setReversed()
+                .addParametricCallback(0.975, setOuttake(1))
                 .build();
 
         PathChain path5 = builder
@@ -95,6 +88,7 @@ public class BlueAuto extends OpMode {
                         )
                 )
                 .setLinearHeadingInterpolation(Math.toRadians(125), Math.toRadians(180))
+                .addParametricCallback(0.5, setIntake(1))
                 .build();
 
         PathChain path6 = builder
@@ -106,6 +100,7 @@ public class BlueAuto extends OpMode {
                         )
                 )
                 .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(125))
+                .addParametricCallback(0.975, setOuttake(1))
                 .build();
 
         PathChain path7 = builder
@@ -138,24 +133,16 @@ public class BlueAuto extends OpMode {
 
     @Override
     public void init() {
-        frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");
-        frontRight = hardwareMap.get(DcMotor.class, "frontRight");
-        backLeft = hardwareMap.get(DcMotor.class, "backLeft");
-        backRight = hardwareMap.get(DcMotor.class, "backRight");
+        follower = Constants.createFollower(hardwareMap);
 
-        // Reverse left motors for proper directionality
-        frontLeft.setDirection(DcMotor.Direction.REVERSE);
-        backLeft.setDirection(DcMotor.Direction.REVERSE);
+        intakeMotor = hardwareMap.get(DcMotor.class, "intake");
+        outtakeLeft = hardwareMap.get(DcMotor.class, "outtakeLeft");
+        outtakeRight = hardwareMap.get(DcMotor.class, "outtakeRight");
 
-        wristRight = hardwareMap.get(Servo.class, "wristRight");
-        wristLeft = hardwareMap.get(Servo.class, "wristLeft");
-        bottomPivot = hardwareMap.get(Servo.class, "bottomPivot");
-        clawServoBottom = hardwareMap.get(Servo.class, "clawServoBottom");
+        // Reverse one outtake motor
+        outtakeRight.setDirection(DcMotor.Direction.REVERSE);
+        stop();
 
-        shoulderLeft = hardwareMap.get(Servo.class, "shoulderLeft");
-        shoulderRight = hardwareMap.get(Servo.class, "shoulderRight");
-
-        extendServo = hardwareMap.get(Servo.class, "extendServo");
 
         pathTimer = new Timer();
         opmodeTimer = new Timer();
@@ -168,12 +155,6 @@ public class BlueAuto extends OpMode {
 
     @Override
     public void start() {
-        retract();
-        startShoulder();
-        upWristBottom();
-        openClawBottom();
-        startPivotBottom();
-        retract();
         opmodeTimer.resetTimer();
         setPathState(0);
     }
@@ -192,50 +173,20 @@ public class BlueAuto extends OpMode {
     }
 
     @Override
-    public void stop() {}
-
-    public void retract() {
-        extendServo.setPosition(0);
+    public void stop() {
+        intakeMotor.setPower(0);
+        outtakeLeft.setPower(0);
+        outtakeRight.setPower(0);
     }
 
-    public void extend() {
-        extendServo.setPosition(.56);
-    }
-    public void openClawBottom() {
-        clawServoBottom.setPosition(1-.3578);
+    public Runnable setIntake(double power) {
+        intakeMotor.setPower(power);
+        return null;
     }
 
-    public void closeClawBottom() {
-        clawServoBottom.setPosition(.9-.7128);
+    public Runnable setOuttake(double power) {
+        outtakeLeft.setPower(power);
+        outtakeLeft.setPower(power);
+        return null;
     }
-
-    public void tightCloseClawBottom() {
-        clawServoBottom.setPosition(.9-.775);
-    }
-
-    public void startPivotBottom () {
-        bottomPivot.setPosition(.0367);
-    }
-
-    public void downWristBottom() {
-        wristRight.setPosition(.9222);
-    }
-
-    public void middleWristBottom() {
-        wristRight.setPosition(.5116);
-    }
-
-    public void scanWristBottom() {
-        wristRight.setPosition(.8733);
-    }
-
-    public void upWristBottom() {
-        wristRight.setPosition(.0978);
-    }
-
-    public void endPivotBottom () {
-        bottomPivot.setPosition(.4033);
-    }
-
-    public void startShoulder() { shoulderLeft.setPosition(.73); }
 }
