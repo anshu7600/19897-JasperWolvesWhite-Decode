@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
-@Autonomous(name = "Aura Auton", group = "Autonomous")
+@Autonomous(name = "LMAuto", group = "Autonomous")
 @Configurable
 public class LMAuto extends OpMode {
 
