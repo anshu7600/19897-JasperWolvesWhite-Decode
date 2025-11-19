@@ -16,9 +16,9 @@ public class PedroTeleop extends OpMode {
     private DcMotor backLeft;
     private DcMotor backRight;
 
-    double targetRPM = 4267;
-    private double ticksPerRev;
-    private boolean rumbleTriggered = false;
+//    double targetRPM = 4267;
+//    private double ticksPerRev;
+//    private boolean rumbleTriggered = false;
 
     @Override
     public void init() {
@@ -28,8 +28,9 @@ public class PedroTeleop extends OpMode {
 
         outtakeLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         outtakeRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        outtakeLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        outtakeRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//        outtakeLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        outtakeRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");
         frontRight = hardwareMap.get(DcMotor.class, "frontRight");
@@ -50,18 +51,18 @@ public class PedroTeleop extends OpMode {
     @Override
     public void start() {
 //        follower.startTeleopDrive(true);
-        ticksPerRev = outtakeLeft.getMotorType().getTicksPerRev();
+//        ticksPerRev = outtakeLeft.getMotorType().getTicksPerRev();
     }
 
     @Override
     public void loop() {
 //        follower.update();
 
-        double targetTicksPerSec = targetRPM * ticksPerRev / 60.0;
+//        double targetTicksPerSec = targetRPM * ticksPerRev / 60.0;
 
         if (gamepad2.right_bumper) {
-            outtakeLeft.setVelocity(targetTicksPerSec);
-            outtakeRight.setVelocity(-targetTicksPerSec);
+            outtakeLeft.setVelocity(-.6);
+            outtakeRight.setVelocity(.6);
         } else if (gamepad2.right_trigger > 0) {
             outtakeLeft.setPower(-.5);
             outtakeRight.setVelocity(.5);
@@ -70,15 +71,15 @@ public class PedroTeleop extends OpMode {
             outtakeRight.setVelocity(0);
         }
 
-        double leftRPM = Math.abs(outtakeLeft.getVelocity() * 60 / ticksPerRev);
-        double rightRPM = Math.abs(outtakeRight.getVelocity() * 60 / ticksPerRev);
-        boolean ready = Math.abs(leftRPM - targetRPM) < 100 && Math.abs(rightRPM - targetRPM) < 100;
-        if (ready && !rumbleTriggered) {
-            gamepad2.rumble(500);
-            rumbleTriggered = true;
-        } else if (!ready) {
-            rumbleTriggered = false;
-        }
+//        double leftRPM = Math.abs(outtakeLeft.getVelocity() * 60 / ticksPerRev);
+//        double rightRPM = Math.abs(outtakeRight.getVelocity() * 60 / ticksPerRev);
+//        boolean ready = Math.abs(leftRPM - targetRPM) < 100 && Math.abs(rightRPM - targetRPM) < 100;
+//        if (ready && !rumbleTriggered) {
+//            gamepad2.rumble(500);
+//            rumbleTriggered = true;
+//        } else if (!ready) {
+//            rumbleTriggered = false;
+//        }
 
         if (gamepad2.left_bumper) {
             intake.setPower(.95);
@@ -86,11 +87,11 @@ public class PedroTeleop extends OpMode {
             intake.setPower(-.95);
         }
 
-        if (gamepad1.right_trigger > .5) {
-            targetRPM = targetRPM + 100;
-        } else if (gamepad1.left_trigger > .5) {
-            targetRPM = targetRPM - 100;
-        }
+//        if (gamepad1.right_trigger > .5) {
+//            targetRPM = targetRPM + 100;
+//        } else if (gamepad1.left_trigger > .5) {
+//            targetRPM = targetRPM - 100;
+//        }
 
 //        follower.setTeleOpDrive(
 //                -gamepad1.left_stick_y,
@@ -102,9 +103,9 @@ public class PedroTeleop extends OpMode {
     }
 
     public void updateTelemetry() {
-        telemetry.addData("Current target RPM ", targetRPM);
-        telemetry.addData("Left RPM ", outtakeLeft.getVelocity() * 60 / ticksPerRev);
-        telemetry.addData("Right RPM ", outtakeRight.getVelocity() * 60 / ticksPerRev);
+//        telemetry.addData("Current target RPM ", targetRPM);
+//        telemetry.addData("Left RPM ", outtakeLeft.getVelocity() * 60 / ticksPerRev);
+//        telemetry.addData("Right RPM ", outtakeRight.getVelocity() * 60 / ticksPerRev);
         telemetry.addData("Position ", follower.getPose());
         telemetry.addData("Velocity ", follower.getVelocity());
     }
