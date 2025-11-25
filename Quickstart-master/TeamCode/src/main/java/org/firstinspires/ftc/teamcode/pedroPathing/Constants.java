@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.pedroPathing;
 
+import com.pedropathing.control.FilteredPIDFCoefficients;
 import com.pedropathing.control.PIDFCoefficients;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.follower.FollowerConstants;
@@ -16,15 +17,22 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 public class Constants {
     public static FollowerConstants followerConstants = new FollowerConstants()
 //          TODO: Update the mass in KGs
-            .mass(67)
+            .mass(9.4)
+
+//           Todo: Change the space to accelerate to be closer to your max forward velocity.
+//            Then run the test.
+           .forwardZeroPowerAcceleration(-30.29856)
+//           Todo: Change the space to accelerate to be closer to your max lateral velocity.
+//            Then run the test.
+            .lateralZeroPowerAcceleration(-66.597369)
 //          TODO: Update these values after tuning it on Panels
-//          .translationalPIDFCoefficients(new PIDFCoefficients(0.1, 0, 0.01, 0))
+          .translationalPIDFCoefficients(new PIDFCoefficients(0.07, 0, 0.001, 0.02))
 //           Then:
-//          .headingPIDFCoefficients(new PIDFCoefficients(0.1, 0, 0.01, 0))
+          .headingPIDFCoefficients(new PIDFCoefficients(.9, 0, 0, 0.003))
 //           Then
-//           .drivePIDFCoefficients(new FilteredPIDFCoefficients(0.1,0.0,0.01,0.6,0.0))
+           .drivePIDFCoefficients(new FilteredPIDFCoefficients(0.1,0.0,0.01,0.6,0.0))
 //           Then
-//           .centripetalScaling(0.005)
+           .centripetalScaling(0.0002)
             ;
 
     public static MecanumConstants driveConstants = new MecanumConstants()
@@ -37,32 +45,30 @@ public class Constants {
             .leftRearMotorDirection(DcMotorSimple.Direction.REVERSE)
             .rightFrontMotorDirection(DcMotorSimple.Direction.FORWARD)
             .rightRearMotorDirection(DcMotorSimple.Direction.FORWARD)
+
             // This is to be done after the Localization stuff
 //          TODO: Get this with Forward Velocity Tuner
 //            Moves forward 72 inches
-//          .xVelocity(67)
+          .xVelocity(62.0885)
 //          TODO: Get this with Lateral Velocity Tuner
 //            Moves left 72 inches
-//         .yVelocity(67)
+         .yVelocity(49.8944908)
 
             // Push code
 
-//           Todo: Change the space to accelerate to be closer to your max forward velocity.
-//            Then run the test.
-//           .forwardZeroPowerAcceleration(deceleration)
-//           Todo: Change the space to accelerate to be closer to your max lateral velocity.
-//            Then run the test.
-//           .forwardZeroPowerAcceleration(deceleration)
+
         ;
 
     public static TwoWheelConstants localizerConstants = new TwoWheelConstants()
-            .forwardEncoder_HardwareMapName("frontLeft")
-            .strafeEncoder_HardwareMapName("backRight")
+            .forwardEncoder_HardwareMapName("intake")
+            .strafeEncoder_HardwareMapName("frontLeft")
             .IMU_HardwareMapName("imu")
+            .strafePodX(4.35)
+            .forwardPodY(2.1225)
 //            TODO: Reverse as Needed
 //             Then, move the robot forward. The x coordinate should increase. Next, move the robot left. The y coordinate should increase.
 //             If either of those does not happen, you must reverse the respective encoder.
-//            .forwardEncoderDirection(Encoder.REVERSE)
+            .forwardEncoderDirection(Encoder.REVERSE)
 //            // and/or:
 //            .strafeEncoderDirection(Encoder.REVERSE)
 
@@ -71,11 +77,12 @@ public class Constants {
 //             This distance is configurable if needed. Once you push the robot forward, two numbers will be displayed on telemetry:
 //             The distance: the robot thinks it has traveled
 //             The multiplier: this is the number you want.
-//            .forwardTicksToInches(multiplier)
+            .forwardTicksToInches(.0019863)
 
 //            TODO: Lateral Tuner
 //             Same as the Forward one but now to left.
-//            .strafeTicksToInches(multiplier)
+            .strafeTicksToInches(.0019963)
+
 
             .IMU_Orientation(
                     new RevHubOrientationOnRobot(
@@ -84,7 +91,7 @@ public class Constants {
                     )
             );
 
-    public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1, 1);
+    public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1.3, 1);
     // TODO: Make sure you change braking before Drive PID if needed
 
     public static Follower createFollower(HardwareMap hardwareMap) {
