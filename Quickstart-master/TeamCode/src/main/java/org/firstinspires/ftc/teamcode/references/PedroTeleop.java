@@ -1,13 +1,13 @@
 package org.firstinspires.ftc.teamcode.references;
-// import com.pedropathing.follower.Follower;
+ import com.pedropathing.follower.Follower;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
-@TeleOp(name = "TeleopBetter Work", group = "TeleOp")
+@TeleOp(name = "AtThisPointIDK", group = "TeleOp")
 public class PedroTeleop extends OpMode {
-    // private Follower follower;
+     private Follower follower;
     private DcMotorEx outtakeLeft, outtakeRight;
     private DcMotor intake;
     private DcMotor frontLeft;
@@ -92,11 +92,6 @@ public class PedroTeleop extends OpMode {
             targetRPM = targetRPM - 100;
         }
 
-//        follower.setTeleOpDrive(
-//                -gamepad1.left_stick_y,
-//                -gamepad1.left_stick_x,
-//                -gamepad1.right_stick_x,
-//                true);
         controlDrivetrain();
         updateTelemetry();
     }
