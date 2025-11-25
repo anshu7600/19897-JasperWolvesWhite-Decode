@@ -86,9 +86,9 @@ public class PedroTeleop extends OpMode {
             intake.setPower(0);
         }
 
-        if (gamepad1.right_bumper) {
+        if (gamepad1.dpadUpWasReleased()) {
             targetRPM = targetRPM + 100;
-        } else if (gamepad1.left_bumper) {
+        } else if (gamepad1.dpadDownWasReleased()) {
             targetRPM = targetRPM - 100;
         }
 
