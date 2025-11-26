@@ -1,215 +1,213 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode;//package org.firstinspires.ftc.teamcode.autonomous;
 
-import com.bylazar.configurables.annotations.Configurable;
-import com.bylazar.telemetry.PanelsTelemetry;
-import com.bylazar.telemetry.TelemetryManager;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
+import com.pedropathing.paths.Path;
 import com.pedropathing.paths.PathChain;
+import com.pedropathing.util.Timer;
+
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
-@Autonomous(name = "Another RANDOM ah Auton be like", group = "Autonomous")
-@Configurable // Panels
+@Autonomous(name = "RelativeHeadingAuto", group = "Autos")
 public class AnotherRandomAhAuton extends OpMode {
 
-    private TelemetryManager panelsTelemetry; // Panels Telemetry instance
-    public Follower follower; // Pedro Pathing follower instance
-    private int pathState; // Current autonomous path state (state machine)
-    private Paths paths; // Paths defined in the Paths class
+    private Follower follower;
 
-    @Override
-    public void init() {
-        panelsTelemetry = PanelsTelemetry.INSTANCE.getTelemetry();
+    private Timer pathTimer;
+    private int pathState;
 
-        follower = Constants.createFollower(hardwareMap);
-        follower.setStartingPose(new Pose(72, 8, Math.toRadians(90)));
+    // -------------------------------
+    // STARTING + TARGET POSES
+    // -------------------------------
+    private final Pose startPose = new Pose(22, 123, Math.toRadians(270));
+    private final Pose midPose   = new Pose(48, 96, Math.toRadians(0));
+    private final Pose backPose  = new Pose(18, 84, Math.toRadians(0));
+    private final Pose dropPose  = new Pose(46, 35.5, Math.toRadians(0));
 
-        paths = new Paths(follower); // Build paths
+    // -------------------------------
+    // PATHS
+    // -------------------------------
+    private PathChain path1, path2, path3, path4, path5, path6, path7, path8;
 
-        panelsTelemetry.debug("Status", "Initialized");
-        panelsTelemetry.update(telemetry);
+    // -------------------------------
+    // BUILD PATHS USING TANGENT HEADING
+    // -------------------------------
+    public void buildPaths() {
+
+        // Path 1
+        path1 = follower.pathBuilder()
+                .addPath(new BezierCurve(
+                        startPose,
+                        new Pose(34, 113),
+                        midPose
+                ))
+                .setTangentHeadingInterpolation()   // <— robot-relative heading
+                .build();
+
+        // Path 2
+        path2 = follower.pathBuilder()
+                .addPath(new BezierCurve(
+                        midPose,
+                        new Pose(52, 88),
+                        new Pose(46, 84)
+                ))
+                .setTangentHeadingInterpolation()
+                .build();
+
+        // Path 3
+        path3 = follower.pathBuilder()
+                .addPath(new BezierLine(
+                        new Pose(46, 84),
+                        backPose
+                ))
+                .setTangentHeadingInterpolation()
+                .build();
+
+        // Path 4
+        path4 = follower.pathBuilder()
+                .addPath(new BezierLine(
+                        backPose,
+                        midPose
+                ))
+                .setTangentHeadingInterpolation()
+                .build();
+
+        // Path 5
+        path5 = follower.pathBuilder()
+                .addPath(new BezierCurve(
+                        midPose,
+                        new Pose(60, 61),
+                        new Pose(46, 60)
+                ))
+                .setTangentHeadingInterpolation()
+                .build();
+
+        // Path 6
+        path6 = follower.pathBuilder()
+                .addPath(new BezierLine(
+                        new Pose(46, 60),
+                        new Pose(20, 60)
+                ))
+                .setTangentHeadingInterpolation()
+                .build();
+
+        // Path 7
+        path7 = follower.pathBuilder()
+                .addPath(new BezierLine(
+                        new Pose(20, 60),
+                        midPose
+                ))
+                .setTangentHeadingInterpolation()
+                .build();
+
+        // Path 8
+        path8 = follower.pathBuilder()
+                .addPath(new BezierLine(
+                        midPose,
+                        dropPose
+                ))
+                .setTangentHeadingInterpolation()
+                .build();
     }
 
-    @Override
-    public void loop() {
-        follower.update(); // Update Pedro Pathing
-        pathState = autonomousPathUpdate(); // Update autonomous state machine
-
-        // Log values to Panels and Driver Station
-        panelsTelemetry.debug("Path State", pathState);
-        panelsTelemetry.debug("X", follower.getPose().getX());
-        panelsTelemetry.debug("Y", follower.getPose().getY());
-        panelsTelemetry.debug("Heading", follower.getPose().getHeading());
-        panelsTelemetry.update(telemetry);
-    }
-
-    public static class Paths {
-
-        public PathChain Path1;
-        public PathChain Path2;
-        public PathChain Path3;
-        public PathChain Path4;
-        public PathChain Path5;
-        public PathChain Path6;
-        public PathChain Path7;
-        public PathChain Path8;
-
-        public Paths(Follower follower) {
-            Path1 = follower
-                    .pathBuilder()
-                    .addPath(
-                            new BezierCurve(
-                                    new Pose(22.000, 123.000),
-                                    new Pose(34.000, 113.000),
-                                    new Pose(48.000, 96.000)
-                            )
-                    )
-                    .setLinearHeadingInterpolation(Math.toRadians(324), Math.toRadians(312))
-                    .build();
-
-            Path2 = follower
-                    .pathBuilder()
-                    .addPath(
-                            new BezierCurve(
-                                    new Pose(48.000, 96.000),
-                                    new Pose(52.000, 88.000),
-                                    new Pose(46.000, 84.000)
-                            )
-                    )
-                    .setLinearHeadingInterpolation(Math.toRadians(312), Math.toRadians(180))
-                    .build();
-
-            Path3 = follower
-                    .pathBuilder()
-                    .addPath(
-                            new BezierLine(new Pose(46.000, 84.000), new Pose(18.000, 84.000))
-                    )
-                    .setTangentHeadingInterpolation()
-                    .build();
-
-            Path4 = follower
-                    .pathBuilder()
-                    .addPath(
-                            new BezierLine(new Pose(18.000, 84.000), new Pose(48.000, 96.000))
-                    )
-                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(312))
-                    .build();
-
-            Path5 = follower
-                    .pathBuilder()
-                    .addPath(
-                            new BezierCurve(
-                                    new Pose(48.000, 96.000),
-                                    new Pose(60.000, 61.000),
-                                    new Pose(46.000, 60.000)
-                            )
-                    )
-                    .setLinearHeadingInterpolation(Math.toRadians(312), Math.toRadians(180))
-                    .build();
-
-            Path6 = follower
-                    .pathBuilder()
-                    .addPath(
-                            new BezierLine(new Pose(46.000, 60.000), new Pose(20.000, 60.000))
-                    )
-                    .setTangentHeadingInterpolation()
-                    .build();
-
-            Path7 = follower
-                    .pathBuilder()
-                    .addPath(
-                            new BezierLine(new Pose(20.000, 60.000), new Pose(48.000, 96.000))
-                    )
-                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(312))
-                    .build();
-
-            Path8 = follower
-                    .pathBuilder()
-                    .addPath(
-                            new BezierLine(new Pose(48.000, 96.000), new Pose(46.000, 35.500))
-                    )
-                    .setLinearHeadingInterpolation(Math.toRadians(312), Math.toRadians(180))
-                    .build();
-        }
-    }
-
-    public int autonomousPathUpdate() {
-
+    // -------------------------------
+    // STATE MACHINE
+    // -------------------------------
+    public void autoStateUpdate() {
         switch (pathState) {
-
             case 0:
-                // Start first path
-                follower.followPath(paths.Path1);
-                pathState = 1;
+                follower.followPath(path1);
+                nextState();
                 break;
 
             case 1:
-                // Wait for Path1 to finish
                 if (!follower.isBusy()) {
-                    follower.followPath(paths.Path2);
-                    pathState = 2;
+                    follower.followPath(path2);
+                    nextState();
                 }
                 break;
 
             case 2:
                 if (!follower.isBusy()) {
-                    follower.followPath(paths.Path3);
-                    pathState = 3;
+                    follower.followPath(path3);
+                    nextState();
                 }
                 break;
 
             case 3:
                 if (!follower.isBusy()) {
-                    follower.followPath(paths.Path4);
-                    pathState = 4;
+                    follower.followPath(path4);
+                    nextState();
                 }
                 break;
 
             case 4:
                 if (!follower.isBusy()) {
-                    follower.followPath(paths.Path5);
-                    pathState = 5;
+                    follower.followPath(path5);
+                    nextState();
                 }
                 break;
 
             case 5:
                 if (!follower.isBusy()) {
-                    follower.followPath(paths.Path6);
-                    pathState = 6;
+                    follower.followPath(path6);
+                    nextState();
                 }
                 break;
 
             case 6:
                 if (!follower.isBusy()) {
-                    follower.followPath(paths.Path7);
-                    pathState = 7;
+                    follower.followPath(path7);
+                    nextState();
                 }
                 break;
 
             case 7:
                 if (!follower.isBusy()) {
-                    follower.followPath(paths.Path8);
-                    pathState = 8;
+                    follower.followPath(path8);
+                    nextState();
                 }
                 break;
 
             case 8:
-                if (!follower.isBusy()) {
-                    // DONE — park or hold final pose
-                    pathState = 999;
-                }
-                break;
-
-            case 999:
-                // Autonomous complete
+                // DONE
                 break;
         }
-
-        return pathState;
     }
 
+    private void nextState() {
+        pathState++;
+        pathTimer.resetTimer();
+    }
+
+    // -------------------------------
+    // INIT
+    // -------------------------------
+    @Override
+    public void init() {
+        follower = Constants.createFollower(hardwareMap);
+        pathTimer = new Timer();
+        follower.setStartingPose(startPose);
+        buildPaths();
+    }
+
+    // -------------------------------
+    // LOOP
+    // -------------------------------
+    @Override
+    public void loop() {
+        follower.update();
+        autoStateUpdate();
+
+        telemetry.addData("State", pathState);
+        telemetry.addData("X", follower.getPose().getX());
+        telemetry.addData("Y", follower.getPose().getY());
+        telemetry.addData("Heading", Math.toDegrees(follower.getPose().getHeading()));
+        telemetry.update();
+    }
 }
