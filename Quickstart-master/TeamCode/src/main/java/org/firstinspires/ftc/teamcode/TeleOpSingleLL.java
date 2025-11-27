@@ -12,7 +12,6 @@ public class TeleOpSingleLL extends OpMode {
 
     private DcMotorEx outtakeLeft, outtakeRight;
     private DcMotor intake, frontLeft, frontRight, backLeft, backRight;
-
     private static final double DRIVETRAIN_SPEED = 0.95;
     private static final double STRAFE_MULTIPLIER = 1.1;
     private static final double ROTATION_MULTIPLIER = 0.6;
@@ -182,7 +181,7 @@ public class TeleOpSingleLL extends OpMode {
         double kD = 0.001;
 
         double output = kP * yaw + kD * derivative;
-        output = clamp(output, -0.5, 0.5);
+        output = clamp(output);
 
         telemetry.addData("Tx", yaw);
         telemetry.addData("TurnPower", output);
@@ -190,8 +189,8 @@ public class TeleOpSingleLL extends OpMode {
         return output;
     }
 
-    private double clamp(double v, double min, double max) {
-        return Math.max(min, Math.min(max, v));
+    private double clamp(double v) {
+        return Math.max(-0.5, Math.min(0.5, v));
     }
 
     private void toggleAlliance() {
