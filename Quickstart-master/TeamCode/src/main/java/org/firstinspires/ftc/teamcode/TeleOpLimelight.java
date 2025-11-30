@@ -8,15 +8,18 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 
-@TeleOp(name = "Lemon Teleop", group = "TeleOp")
+@TeleOp(name = "Split Screen Blue Teleop", group = "TeleOp")
 public class TeleOpLimelight extends OpMode {
     // private Follower follower;
     private DcMotorEx outtakeLeft, outtakeRight;
     private DcMotor intake, frontLeft, frontRight, backLeft, backRight;
 
-    double targetRPM = 2567;
-    double targetRPMLow = 2067;
-    private double ticksPerRev;
+    private final double ticksPerRev = 28;
+
+    private double lastTargetTicks = 0;
+
+    private long stableStartTime = 0;
+
     private boolean rumbleTriggered = false;
 
     private Limelight3A limelight;
@@ -49,13 +52,21 @@ public class TeleOpLimelight extends OpMode {
         backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
+        double kP = 20;
+        double kI = 0;
+        double kD = 1.0;
+        double kF = (32767.0 / (6000 * ticksPerRev)) * 60.0;
+
+        outtakeLeft.setVelocityPIDFCoefficients(kP, kI, kD, kF);
+        outtakeRight.setVelocityPIDFCoefficients(kP, kI, kD, kF);
+
+
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
         limelight.pipelineSwitch(0);
     }
 
     @Override
     public void start() {
-        ticksPerRev = 28;
         limelight.start();
     }
 
@@ -68,7 +79,6 @@ public class TeleOpLimelight extends OpMode {
     }
 
     public void updateTelemetry() {
-        telemetry.addData("Current target RPM ", targetRPM);
         telemetry.addData("Left RPM ", outtakeLeft.getVelocity() * 60 / ticksPerRev);
         telemetry.addData("Right RPM ", outtakeRight.getVelocity() * 60 / ticksPerRev);
     }
@@ -98,28 +108,69 @@ public class TeleOpLimelight extends OpMode {
     }
 
     private void controlOuttake() {
-        if (gamepad2.right_bumper) {
-            double targetTicksPerSec = targetRPM * ticksPerRev / 60.0;
-            outtakeLeft.setVelocity(-targetTicksPerSec);
-            outtakeRight.setVelocity(targetTicksPerSec);
-        } else if (gamepad2.right_trigger > 0) {
-            double targetTicksPerSec = targetRPMLow * ticksPerRev / 60.0;
-            outtakeLeft.setVelocity(-targetTicksPerSec);
-            outtakeRight.setVelocity(targetTicksPerSec);
-        } else {
+        boolean highShot = gamepad2.right_bumper;
+        boolean lowShot = gamepad2.right_trigger > 0.1;
+
+        double targetRPM = 0;
+
+        if (highShot) {
+            // your shooting speed
+            double TARGET_RPM_HIGH = 3300;
+            targetRPM = TARGET_RPM_HIGH;
+        } else if (lowShot) {
+            // slower mode (change if needed)
+            double TARGET_RPM_LOW = 2650;
+            targetRPM = TARGET_RPM_LOW;
+        }
+
+        double targetTicks = targetRPM * ticksPerRev / 60.0;
+
+        // Only update velocity when the target changes
+        if (targetTicks != lastTargetTicks) {
+            outtakeLeft.setVelocity(-targetTicks);
+            outtakeRight.setVelocity(targetTicks);
+            lastTargetTicks = targetTicks;
+            stableStartTime = 0;
+            rumbleTriggered = false;
+        }
+
+        // Stopped
+        if (targetRPM == 0) {
             outtakeLeft.setVelocity(0);
             outtakeRight.setVelocity(0);
+            lastTargetTicks = 0;
+            stableStartTime = 0;
+            rumbleTriggered = false;
+            return;
         }
-        double leftRPM = Math.abs(outtakeLeft.getVelocity() * 60 / ticksPerRev);
+
+        // Measure current RPM
+        double leftRPM  = Math.abs(outtakeLeft.getVelocity() * 60 / ticksPerRev);
         double rightRPM = Math.abs(outtakeRight.getVelocity() * 60 / ticksPerRev);
-        boolean ready = Math.abs(leftRPM - targetRPM) < 100 && Math.abs(rightRPM - targetRPM) < 100;
-        if (ready && !rumbleTriggered) {
-            gamepad2.rumble(500);
-            rumbleTriggered = true;
-        } else if (!ready) {
+
+        boolean inRange =
+                Math.abs(leftRPM - targetRPM) < 60 &&
+                        Math.abs(rightRPM - targetRPM) < 60;
+
+        if (inRange) {
+            if (stableStartTime == 0)
+                stableStartTime = System.currentTimeMillis();
+
+            long elapsed = System.currentTimeMillis() - stableStartTime;
+
+            // needs 150ms stable before “ready”
+            long requiredStableMs = 50;
+            if (elapsed > requiredStableMs && !rumbleTriggered) {
+                gamepad2.rumble(400);
+                rumbleTriggered = true;
+            }
+
+        } else {
+            stableStartTime = 0;
             rumbleTriggered = false;
         }
     }
+
 
     private void controlIntake() {
         if (gamepad2.left_bumper) {
@@ -138,7 +189,7 @@ public class TeleOpLimelight extends OpMode {
             telemetry.addLine("No Tag Detected");
             return 0;
         }
-        double yaw = results.getTx();  // positive = tag is right, negative = left
+        double yaw = results.getTx()-4;  // positive = tag is right, negative = left
         double derivative = yaw - lastError;
         lastError = yaw;
         double kP = 0.03;

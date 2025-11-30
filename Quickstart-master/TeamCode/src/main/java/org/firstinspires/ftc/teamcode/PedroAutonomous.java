@@ -12,9 +12,9 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
-@Autonomous(name = "Another RANDOM ah Auton be like", group = "Autonomous")
+@Autonomous(name = "Pedro Pathing Autonomous", group = "Autonomous")
 @Configurable // Panels
-public class AnotherRandomAhAuton extends OpMode {
+public class PedroAutonomous extends OpMode {
 
     private TelemetryManager panelsTelemetry; // Panels Telemetry instance
     public Follower follower; // Pedro Pathing follower instance
@@ -26,7 +26,7 @@ public class AnotherRandomAhAuton extends OpMode {
         panelsTelemetry = PanelsTelemetry.INSTANCE.getTelemetry();
 
         follower = Constants.createFollower(hardwareMap);
-        follower.setStartingPose(new Pose(72, 8, Math.toRadians(90)));
+        follower.setStartingPose(new Pose(22, 123, Math.toRadians(324)));
 
         paths = new Paths(follower); // Build paths
 
@@ -142,13 +142,13 @@ public class AnotherRandomAhAuton extends OpMode {
         switch (pathState) {
 
             case 0:
-                // Start first path
+                // Start Path 1
                 follower.followPath(paths.Path1);
                 pathState = 1;
                 break;
 
             case 1:
-                // Wait for Path1 to finish
+                // Wait for Path 1 to finish, then start Path 2
                 if (!follower.isBusy()) {
                     follower.followPath(paths.Path2);
                     pathState = 2;
@@ -156,6 +156,7 @@ public class AnotherRandomAhAuton extends OpMode {
                 break;
 
             case 2:
+                // Path 2 → Path 3
                 if (!follower.isBusy()) {
                     follower.followPath(paths.Path3);
                     pathState = 3;
@@ -163,6 +164,7 @@ public class AnotherRandomAhAuton extends OpMode {
                 break;
 
             case 3:
+                // Path 3 → Path 4
                 if (!follower.isBusy()) {
                     follower.followPath(paths.Path4);
                     pathState = 4;
@@ -170,6 +172,7 @@ public class AnotherRandomAhAuton extends OpMode {
                 break;
 
             case 4:
+                // Path 4 → Path 5
                 if (!follower.isBusy()) {
                     follower.followPath(paths.Path5);
                     pathState = 5;
@@ -177,6 +180,7 @@ public class AnotherRandomAhAuton extends OpMode {
                 break;
 
             case 5:
+                // Path 5 → Path 6
                 if (!follower.isBusy()) {
                     follower.followPath(paths.Path6);
                     pathState = 6;
@@ -184,6 +188,7 @@ public class AnotherRandomAhAuton extends OpMode {
                 break;
 
             case 6:
+                // Path 6 → Path 7
                 if (!follower.isBusy()) {
                     follower.followPath(paths.Path7);
                     pathState = 7;
@@ -191,6 +196,7 @@ public class AnotherRandomAhAuton extends OpMode {
                 break;
 
             case 7:
+                // Path 7 → Path 8
                 if (!follower.isBusy()) {
                     follower.followPath(paths.Path8);
                     pathState = 8;
@@ -198,18 +204,17 @@ public class AnotherRandomAhAuton extends OpMode {
                 break;
 
             case 8:
+                // Done – robot finished all paths
                 if (!follower.isBusy()) {
-                    // DONE — park or hold final pose
-                    pathState = 999;
+                    pathState = 9; // final idle state
                 }
                 break;
 
-            case 999:
-                // Autonomous complete
+            default:
+                // Idle forever
                 break;
         }
 
         return pathState;
     }
-
 }

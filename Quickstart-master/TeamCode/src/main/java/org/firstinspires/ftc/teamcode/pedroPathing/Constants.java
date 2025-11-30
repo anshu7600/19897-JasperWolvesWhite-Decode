@@ -26,11 +26,11 @@ public class Constants {
 //            Then run the test.
             .lateralZeroPowerAcceleration(-66.597369)
 //          TODO: Update these values after tuning it on Panels
-          .translationalPIDFCoefficients(new PIDFCoefficients(0.07, 0, 0.001, 0.02))
+          .translationalPIDFCoefficients(new PIDFCoefficients(0.06, 0, 0.001, 0.02))
 //           Then:
           .headingPIDFCoefficients(new PIDFCoefficients(.9, 0, 0, 0.003))
 //           Then
-           .drivePIDFCoefficients(new FilteredPIDFCoefficients(0.1,0.0,0.01,0.6,0.0))
+           .drivePIDFCoefficients(new FilteredPIDFCoefficients(0.07,0.0,0.001,0.6,0.0))
 //           Then
            .centripetalScaling(0.0002)
             ;
@@ -91,7 +91,7 @@ public class Constants {
                     )
             );
 
-    public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1.3, 1);
+    public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 5, .1);
     // TODO: Make sure you change braking before Drive PID if needed
 
     public static Follower createFollower(HardwareMap hardwareMap) {
