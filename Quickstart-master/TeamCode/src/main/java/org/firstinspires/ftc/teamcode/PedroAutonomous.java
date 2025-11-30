@@ -136,85 +136,80 @@ public class PedroAutonomous extends OpMode {
                     .build();
         }
     }
+    private boolean pathJustStarted = false;
+    private long pathStartTime = 0;
 
     public int autonomousPathUpdate() {
+
+        // Allow follower to fully detect path completion
+        if (pathJustStarted && follower.isBusy()) {
+            return pathState;
+        }
+
+        // If path just finished, wait 150–200ms so heading settles
+        if (pathJustStarted && !follower.isBusy()) {
+            if (System.currentTimeMillis() - pathStartTime < 180) {
+                return pathState; // waiting for stabilization
+            }
+            pathJustStarted = false;
+            pathState++;
+        }
 
         switch (pathState) {
 
             case 0:
-                // Start Path 1
                 follower.followPath(paths.Path1);
-                pathState = 1;
+                startPath();
                 break;
 
             case 1:
-                // Wait for Path 1 to finish, then start Path 2
-                if (!follower.isBusy()) {
-                    follower.followPath(paths.Path2);
-                    pathState = 2;
-                }
+                follower.followPath(paths.Path2);
+                startPath();
                 break;
 
             case 2:
-                // Path 2 → Path 3
-                if (!follower.isBusy()) {
-                    follower.followPath(paths.Path3);
-                    pathState = 3;
-                }
+                follower.followPath(paths.Path3);
+                startPath();
                 break;
 
             case 3:
-                // Path 3 → Path 4
-                if (!follower.isBusy()) {
-                    follower.followPath(paths.Path4);
-                    pathState = 4;
-                }
+                follower.followPath(paths.Path4);
+                startPath();
                 break;
 
             case 4:
-                // Path 4 → Path 5
-                if (!follower.isBusy()) {
-                    follower.followPath(paths.Path5);
-                    pathState = 5;
-                }
+                follower.followPath(paths.Path5);
+                startPath();
                 break;
 
             case 5:
-                // Path 5 → Path 6
-                if (!follower.isBusy()) {
-                    follower.followPath(paths.Path6);
-                    pathState = 6;
-                }
+                follower.followPath(paths.Path6);
+                startPath();
                 break;
 
             case 6:
-                // Path 6 → Path 7
-                if (!follower.isBusy()) {
-                    follower.followPath(paths.Path7);
-                    pathState = 7;
-                }
+                follower.followPath(paths.Path7);
+                startPath();
                 break;
 
             case 7:
-                // Path 7 → Path 8
-                if (!follower.isBusy()) {
-                    follower.followPath(paths.Path8);
-                    pathState = 8;
-                }
+                follower.followPath(paths.Path8);
+                startPath();
                 break;
 
             case 8:
-                // Done – robot finished all paths
-                if (!follower.isBusy()) {
-                    pathState = 9; // final idle state
-                }
-                break;
-
             default:
-                // Idle forever
+                // Autonomous finished
                 break;
         }
 
         return pathState;
     }
+
+    private void startPath() {
+        pathJustStarted = true;
+        pathStartTime = System.currentTimeMillis();
+    }
 }
+
+
