@@ -13,11 +13,10 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
-import org.firstinspires.ftc.teamcode.references.FullAutonAura;
 
 @Autonomous(name = "Another RANDOM ah Auton be like", group = "Autonomous")
 @Configurable // Panels
-public class TrialActionAuto extends OpMode {
+public class TrialActionAutoLinear extends OpMode {
 
     private TelemetryManager panelsTelemetry;
     public Follower follower;
@@ -278,6 +277,9 @@ public class TrialActionAuto extends OpMode {
                     stopAllMotors();
                     nextState();
                 }
+                break;
+
+            default:
                 break;
         }
 
