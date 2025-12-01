@@ -14,7 +14,7 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 @Autonomous(name = "Pedro Pathing Autonomous", group = "Autonomous")
 @Configurable // Panels
-public class PedroAutonomous extends OpMode {
+public class PedroAutonNearRed extends OpMode {
 
     private TelemetryManager panelsTelemetry; // Panels Telemetry instance
     public Follower follower; // Pedro Pathing follower instance
@@ -63,21 +63,21 @@ public class PedroAutonomous extends OpMode {
                     .pathBuilder()
                     .addPath(
                             new BezierCurve(
-                                    new Pose(22.000, 123.000),
-                                    new Pose(34.000, 113.000),
-                                    new Pose(48.000, 96.000)
+                                    new Pose(122.000, 123.000),
+                                    new Pose(110.000, 113.000),
+                                    new Pose(96.000, 96.000)
                             )
                     )
-                    .setLinearHeadingInterpolation(Math.toRadians(324), Math.toRadians(312))
+                    .setLinearHeadingInterpolation(Math.toRadians(216), Math.toRadians(312))
                     .build();
 
             Path2 = follower
                     .pathBuilder()
                     .addPath(
                             new BezierCurve(
-                                    new Pose(48.000, 96.000),
-                                    new Pose(52.000, 88.000),
-                                    new Pose(46.000, 84.000)
+                                    new Pose(96.000, 96.000),
+                                    new Pose(92.000, 88.000),
+                                    new Pose(98.000, 84.000)
                             )
                     )
                     .setLinearHeadingInterpolation(Math.toRadians(312), Math.toRadians(180))
@@ -86,7 +86,7 @@ public class PedroAutonomous extends OpMode {
             Path3 = follower
                     .pathBuilder()
                     .addPath(
-                            new BezierLine(new Pose(46.000, 84.000), new Pose(18.000, 84.000))
+                            new BezierLine(new Pose(98.000, 84.000), new Pose(126.000, 84.000))
                     )
                     .setTangentHeadingInterpolation()
                     .build();
@@ -94,7 +94,7 @@ public class PedroAutonomous extends OpMode {
             Path4 = follower
                     .pathBuilder()
                     .addPath(
-                            new BezierLine(new Pose(18.000, 84.000), new Pose(48.000, 96.000))
+                            new BezierLine(new Pose(126.000, 84.000), new Pose(96.000, 96.000))
                     )
                     .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(312))
                     .build();
@@ -103,9 +103,9 @@ public class PedroAutonomous extends OpMode {
                     .pathBuilder()
                     .addPath(
                             new BezierCurve(
-                                    new Pose(48.000, 96.000),
-                                    new Pose(60.000, 61.000),
-                                    new Pose(46.000, 60.000)
+                                    new Pose(96.000, 96.000),
+                                    new Pose(84.000, 61.000),
+                                    new Pose(98.000, 60.000)
                             )
                     )
                     .setLinearHeadingInterpolation(Math.toRadians(312), Math.toRadians(180))
@@ -114,7 +114,7 @@ public class PedroAutonomous extends OpMode {
             Path6 = follower
                     .pathBuilder()
                     .addPath(
-                            new BezierLine(new Pose(46.000, 60.000), new Pose(20.000, 60.000))
+                            new BezierLine(new Pose(98.000, 60.000), new Pose(124.000, 60.000))
                     )
                     .setTangentHeadingInterpolation()
                     .build();
@@ -122,7 +122,7 @@ public class PedroAutonomous extends OpMode {
             Path7 = follower
                     .pathBuilder()
                     .addPath(
-                            new BezierLine(new Pose(20.000, 60.000), new Pose(48.000, 96.000))
+                            new BezierLine(new Pose(124.000, 60.000), new Pose(96.000, 96.000))
                     )
                     .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(312))
                     .build();
@@ -130,7 +130,7 @@ public class PedroAutonomous extends OpMode {
             Path8 = follower
                     .pathBuilder()
                     .addPath(
-                            new BezierLine(new Pose(48.000, 96.000), new Pose(46.000, 35.500))
+                            new BezierLine(new Pose(96.000, 96.000), new Pose(98.000, 35.500))
                     )
                     .setLinearHeadingInterpolation(Math.toRadians(312), Math.toRadians(180))
                     .build();
