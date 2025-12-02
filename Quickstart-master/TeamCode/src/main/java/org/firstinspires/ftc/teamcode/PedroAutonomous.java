@@ -16,9 +16,9 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
-@Autonomous(name = "Pedro Pathing Autonomous", group = "Autonomous")
+@Autonomous(name = "Pedro Auto MFITBILTPDSPOT", group = "Autonomous")
 @Configurable // Panels
-public class PedroAutonNearBlue extends OpMode {
+public class PedroAutonomous extends OpMode {
 
     private TelemetryManager panelsTelemetry; // Panels Telemetry instance
     public Follower follower; // Pedro Pathing follower instance
@@ -77,7 +77,7 @@ public class PedroAutonNearBlue extends OpMode {
         outtakeRight.setVelocity(0);
         lastTargetTicks = 0;
     }
-//    private double rpm(DcMotorEx motor) {
+    //    private double rpm(DcMotorEx motor) {
 //        return motor.getVelocity() * 60 / TICKS_PER_REV;
 //    }
     private void startOuttake() {
