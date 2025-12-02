@@ -5,11 +5,9 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.IMU;
-import com.qualcomm.robotcore.hardware.Servo;
 
 @TeleOp(name = "Split Screen Blue Teleop", group = "TeleOp")
-public class TeleOpLimelight extends OpMode {
+public class TeleOpDoubleLL extends OpMode {
     // private Follower follower;
     private DcMotorEx outtakeLeft, outtakeRight;
     private DcMotor intake, frontLeft, frontRight, backLeft, backRight;
@@ -115,7 +113,7 @@ public class TeleOpLimelight extends OpMode {
 
         if (highShot) {
             // your shooting speed
-            double TARGET_RPM_HIGH = 3300;
+            double TARGET_RPM_HIGH = 3400;
             targetRPM = TARGET_RPM_HIGH;
         } else if (lowShot) {
             // slower mode (change if needed)

@@ -1,11 +1,13 @@
 package org.firstinspires.ftc.teamcode.references;
  import com.pedropathing.follower.Follower;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 @TeleOp(name = "AtThisPointIDK", group = "TeleOp")
+@Disabled
 public class PedroTeleop extends OpMode {
      private Follower follower;
     private DcMotorEx outtakeLeft, outtakeRight;
