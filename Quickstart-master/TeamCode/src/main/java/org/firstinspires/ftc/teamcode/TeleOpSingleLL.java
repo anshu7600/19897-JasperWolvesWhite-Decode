@@ -17,7 +17,7 @@ public class TeleOpSingleLL extends OpMode {
     private static final double ROTATION_MULTIPLIER = 0.6;
 
     private static final double TICKS_PER_REV = 28;
-    private static final double TARGET_RPM_HIGH = 3300;
+    private static final double TARGET_RPM_HIGH = 3400;
     private static final double TARGET_RPM_LOW = 2650;
 
     private double lastTargetTicks = 0;
