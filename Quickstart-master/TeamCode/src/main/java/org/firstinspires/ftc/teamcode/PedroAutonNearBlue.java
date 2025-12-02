@@ -18,7 +18,7 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 @Autonomous(name = "Pedro Pathing Autonomous", group = "Autonomous")
 @Configurable // Panels
-public class PedroAutonomous extends OpMode {
+public class PedroAutonNearBlue extends OpMode {
 
     private TelemetryManager panelsTelemetry; // Panels Telemetry instance
     public Follower follower; // Pedro Pathing follower instance
