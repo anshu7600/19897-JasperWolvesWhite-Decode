@@ -6,12 +6,14 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.Servo;
 
 @TeleOp(name = "Dore-Le-mon Teleop", group = "TeleOp")
 public class TeleOpSingleLL extends OpMode {
 
     private DcMotorEx outtakeLeft, outtakeRight;
     private DcMotor intake, frontLeft, frontRight, backLeft, backRight;
+    private Servo servo;
     private static final double DRIVETRAIN_SPEED = 0.95;
     private static final double STRAFE_MULTIPLIER = 1.1;
     private static final double ROTATION_MULTIPLIER = 0.6;
@@ -32,7 +34,7 @@ public class TeleOpSingleLL extends OpMode {
         outtakeLeft = hardwareMap.get(DcMotorEx.class, "outtakeLeft");
         outtakeRight = hardwareMap.get(DcMotorEx.class, "outtakeRight");
         intake = hardwareMap.get(DcMotor.class,    "intake");
-
+        servo = hardwareMap.get(Servo.class, "servo");
         frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");
         frontRight = hardwareMap.get(DcMotor.class, "frontRight");
         backLeft = hardwareMap.get(DcMotor.class, "backLeft");
@@ -62,6 +64,12 @@ public class TeleOpSingleLL extends OpMode {
 
     @Override
     public void loop() {
+        if (gamepad1.dpad_right) {
+            servo.setPosition(0);
+        } else if (gamepad1.dpad_left){
+            servo.setPosition(0.12);
+        }
+
         toggleAlliance();
         controlOuttake();
         controlIntake();
