@@ -1,5 +1,4 @@
 package org.firstinspires.ftc.teamcode;
-
 import com.bylazar.configurables.annotations.Configurable;
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
@@ -16,7 +15,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
-@Autonomous(name = "Pedro Auto MFITBILTPDSPOT", group = "Autonomous")
+@Autonomous(name = "Pedro Auto MFITBILTPDSPOTBATBW", group = "Autonomous")
 @Configurable // Panels
 public class PedroAutonomous extends OpMode {
 
@@ -29,11 +28,18 @@ public class PedroAutonomous extends OpMode {
     private Servo servo;
     private static final double TICKS_PER_REV = 28;
     private static final double TARGET_RPM_LOW = 2650;
-    private int shootStep = 0;
     private long shootTimer = 0;
+    private int shootStage = 0;
+    private int ballsShot = 0;
+    private static final long BALL_TIMEOUT_MS = 2000;
+    private double stateTimer = 0;
 
+    // shooting state tracking for autonomous transitions
+    private boolean shootingActive = false;
+    private boolean shootingComplete = false;
 
     private double lastTargetTicks = 0;
+
 
     @Override
     public void init() {
@@ -71,121 +77,220 @@ public class PedroAutonomous extends OpMode {
         panelsTelemetry.debug("Heading", follower.getPose().getHeading());
         panelsTelemetry.update(telemetry);
     }
+
     public void stopOuttake() {
         outtakeLeft.setVelocity(0);
         outtakeRight.setVelocity(0);
         lastTargetTicks = 0;
     }
+
     private void startOuttake() {
         double targetTicks = TARGET_RPM_LOW * TICKS_PER_REV / 60.0;
 
         if (targetTicks != lastTargetTicks) {
+            // original forward directions (left negative, right positive)
             outtakeLeft.setVelocity(-targetTicks);
             outtakeRight.setVelocity(targetTicks);
 
             lastTargetTicks = targetTicks;
         }
     }
+
+    private void reverseOuttake() {
+        double targetTicks = TARGET_RPM_LOW * TICKS_PER_REV / 60.0;
+
+        if (targetTicks != lastTargetTicks) {
+            // reverse directions from startOuttake
+            outtakeLeft.setVelocity(targetTicks);
+            outtakeRight.setVelocity(-targetTicks);
+
+            lastTargetTicks = targetTicks;
+        }
+    }
+
     private void startIntake() {
         double INTAKE_POWER = .95;
         intakeMotor.setPower(INTAKE_POWER);
     }
+
     private void stopIntake() {
         intakeMotor.setPower(0);
     }
+
     private void openServo() {
-        double CLOSE_SERVO = 0;
-        servo.setPosition(CLOSE_SERVO);
-    }
-    private void closeServo() {
-        double OPEN_SERVO = 1.2;
+        double OPEN_SERVO = 0.12;
         servo.setPosition(OPEN_SERVO);
     }
+    private void closeServo() {
+        double CLOSE_SERVO = 0.0;
+        servo.setPosition(CLOSE_SERVO);
+    }
+
+//    private void shootBalls() {
+//        long now = System.currentTimeMillis();
+//
+//        // thresholds for detecting ball movement
+//        double dropThreshold = TARGET_RPM_LOW - 70; // RPM dips when ball enters
+//        double spikeThreshold = TARGET_RPM_LOW - 60; // RPM recovers close to normal
+//
+//        // Read current outtake velocity
+//        double vel = Math.abs(outtakeRight.getVelocity());
+//
+//        panelsTelemetry.debug("Shoot Stage", shootStage);
+//        panelsTelemetry.debug("Vel (RPM)", String.format("%.0f", vel));
+//        panelsTelemetry.debug("Drop Thresh", String.format("%.0f", dropThreshold));
+//        panelsTelemetry.debug("Spike Thresh", String.format("%.0f", spikeThreshold));
+//        panelsTelemetry.debug("Balls Shot", ballsShot);
+//        panelsTelemetry.debug("Timer (ms)", now - shootTimer);
+//        panelsTelemetry.debug("Shooting Active", shootingActive);
+//        panelsTelemetry.debug("Shooting Complete", shootingComplete);
+//
+//        switch (shootStage) {
+//
+//            case 0:
+//                // START SHOOTING
+//                openServo();
+//                startIntake();  // ensure intake FORWARD
+//                shootingActive = true;
+//                shootingComplete = false;
+//                shootTimer = now;
+//                shootStage = 1;
+//                break;
+//
+//            case 1:
+//                // WAIT FOR RPM DIP (ball entering)
+//                if (vel < dropThreshold) {
+//                    shootTimer = now;
+//                    shootStage = 2;
+//                } else if (now - shootTimer >= BALL_TIMEOUT_MS) {
+//                    endShootingEarly();
+//                }
+//                break;
+//
+//            case 2:
+//                // WAIT FOR RPM RECOVERY (ball leaving)
+//                if (vel > spikeThreshold) {
+//                    // TENSION RELIEF: STOP the intake ONLY
+//                    stopIntake();
+//                    shootTimer = now;
+//                    shootStage = 3;
+//                } else if (now - shootTimer >= BALL_TIMEOUT_MS) {
+//                    endShootingEarly();
+//                }
+//                break;
+//
+//            case 3:
+//                // VERY SHORT PAUSE – NO REVERSE POWER
+//                if (now - shootTimer >= 50) {
+//                    shootTimer = now;
+//                    shootStage = 4;
+//                }
+//                break;
+//
+//            case 4:
+//                // WAIT 1 SECOND FOR OUTTAKE TO CLEAR
+//                if (now - shootTimer >= 1000) {
+//
+//                    ballsShot++;
+//
+//                    if (ballsShot >= 2) {
+//                        // FINISHED SHOOTING 2 BALLS
+//                        ballsShot = 0;
+//                        shootingActive = false;
+//                        shootingComplete = true;
+//                        shootStage = 0;
+//                    } else {
+//                        // PREPARE FOR BALL #2
+//                        startIntake();      // <-- FIX: RESTART INTAKE
+//                        shootTimer = now;
+//                        shootStage = 1;     // <-- go back to wait for dip
+//                    }
+//                }
+//                break;
+//        }
+//    }
+
     private void shootBalls() {
-        switch (shootStep) {
+        long now = System.currentTimeMillis();
+
+        // read current velocity
+        double vel = Math.abs(outtakeRight.getVelocity());
+        double targetVel = TARGET_RPM_LOW;
+        double dropAmount = targetVel - vel;
+
+        // panels debug
+        panelsTelemetry.debug("Shoot Stage", shootStage);
+        panelsTelemetry.debug("Vel", vel);
+        panelsTelemetry.debug("DropAmt", dropAmount);
+
+        // single threshold
+        double dropThreshold = 150;  // a ball causes ~300 rpm drop
+
+        switch (shootStage) {
 
             case 0:
-                // close servo → wait 100 ms
-                closeServo();
-                shootTimer = System.currentTimeMillis();
-                shootStep = 3;
+                // Begin shooting sequence
+                shootingActive = true;
+                shootingComplete = false;
+                ballsShot = 0;
+
+                openServo();
+                startIntake();
+
+                shootTimer = now;
+                shootStage = 1;
                 break;
 
             case 1:
-                if (System.currentTimeMillis() - shootTimer >= 50) {
-                    // intake 300 ms
-                    startIntake();
-                    shootTimer = System.currentTimeMillis();
-                    shootStep = 2;
+                // Wait for a sudden 300+ RPM drop
+                if (dropAmount >= dropThreshold) {
+                    stopIntake();   // tension relief
+                    shootTimer = now;
+                    shootStage = 2;
+                }
+                else if (now - shootTimer >= BALL_TIMEOUT_MS) {
+                    endShootingEarly();
                 }
                 break;
 
             case 2:
-                if (System.currentTimeMillis() - shootTimer >= 300) {
-                    stopIntake();
-                    // open servo
-                    openServo();
-                    shootTimer = System.currentTimeMillis();
-                    shootStep = 3;
+                // Give flywheel 50ms to recover without intake pressure
+                if (now - shootTimer >= 50) {
+                    shootTimer = now;
+                    shootStage = 3;
                 }
                 break;
 
             case 3:
-                if (System.currentTimeMillis() - shootTimer >= 1000) {
-                    // intake 100 ms
-                    startIntake();
-                    shootTimer = System.currentTimeMillis();
-                    shootStep = 4;
-                }
-                break;
+                // Give 1 second for the ball to fully clear flywheels
+                if (now - shootTimer >= 1000) {
 
-            case 4:
-                if (System.currentTimeMillis() - shootTimer >= 200) {
-                    stopIntake();
-                    shootTimer = System.currentTimeMillis();
-                    shootStep = 5;
-                }
-                break;
+                    ballsShot++;
 
-            case 5:
-                // wait 1 sec
-                if (System.currentTimeMillis() - shootTimer >= 2000) {
-                    startIntake(); // intake 300 ms
-                    shootTimer = System.currentTimeMillis();
-                    shootStep = 6;
+                    if (ballsShot >= 2) {
+                        // Finished entire sequence
+                        shootingActive = false;
+                        shootingComplete = true;
+                        shootStage = 0;
+                    } else {
+                        // Prep next ball: restart intake and wait for next drop
+                        startIntake();
+                        shootTimer = now;
+                        shootStage = 1;
+                    }
                 }
-                break;
-
-            case 6:
-                if (System.currentTimeMillis() - shootTimer >= 300) {
-                    stopIntake();
-                    shootTimer = System.currentTimeMillis();
-                    shootStep = 7;
-                }
-                break;
-
-            case 7:
-                // wait 1 sec
-                if (System.currentTimeMillis() - shootTimer >= 1000) {
-                    startIntake(); // intake 500 ms
-                    shootTimer = System.currentTimeMillis();
-                    shootStep = 8;
-                }
-                break;
-
-            case 8:
-                if (System.currentTimeMillis() - shootTimer >= 500) {
-                    stopIntake();
-                    shootStep = 67; // done
-                }
-                break;
-
-            case 67:
-                // finished shooting
                 break;
         }
     }
 
+    private void endShootingEarly() {
+        // stop intake, keep shooter behavior consistent
+        stopIntake();
+        ballsShot = 0;
+        shootStage = 0;
+        shootingActive = false;
+        shootingComplete = true;
+    }
 
     public static class Paths {
         public PathChain ToShoot;
@@ -281,24 +386,34 @@ public class PedroAutonomous extends OpMode {
         }
     }
 
-
     public int autonomousPathUpdate() {
 
         switch (pathState) {
 
             case 0:
                 // Start outtake
+                stateTimer = System.currentTimeMillis();
                 startOuttake();
+                follower.setMaxPowerScaling(.85);
                 follower.followPath(paths.ToShoot);
                 pathState = 1;
                 break;
 
             case 1:
-                if (!follower.isBusy()) {
-                    // Fire the balls, Open servo, Intake on to push balls to outtake
-                    closeServo();
-                    shootBalls();
-                    if (shootStep == 67) pathState = 2;
+                if (!follower.isBusy() && System.currentTimeMillis() - stateTimer >= 4000) {
+                    if (!shootingActive && !shootingComplete) {
+                        follower.setMaxPowerScaling(1);
+                        shootStage = 0;
+                        ballsShot = 0;
+                        shootTimer = 0;
+                        openServo();
+                        shootBalls();
+                    } else if (shootingActive && !shootingComplete) {
+                        shootBalls();
+                    } else if (shootingComplete) {
+                        shootingComplete = false;
+                        pathState = 2;
+                    }
                 }
                 break;
 
@@ -312,7 +427,8 @@ public class PedroAutonomous extends OpMode {
 
             case 3:
                 if (!follower.isBusy()) {
-                    // Intake on to intake the first set, keep servo closed
+                    // Intake on to intake the first set, keep the servo closed
+                    follower.setMaxPowerScaling(.7);
                     startIntake();
                     closeServo();
                     follower.followPath(paths.IntakeFirstSet);
@@ -322,7 +438,8 @@ public class PedroAutonomous extends OpMode {
 
             case 4:
                 if (!follower.isBusy()) {
-                    // Turn off intake, Turn on outtake while going to shoot, keep servo closed
+                    follower.setMaxPowerScaling(1);
+                    // Turn off intake, Turn on outtake while going to shoot, keep the servo closed
                     closeServo();
                     startOuttake();
                     stopIntake();
@@ -333,10 +450,18 @@ public class PedroAutonomous extends OpMode {
 
             case 5:
                 if (!follower.isBusy()) {
-                    // Fire the balls, Open servo, Intake on to push balls to outtake
-                    if (shootStep == 67) shootStep = 0;
-                    shootBalls();
-                    if (shootStep == 67) {
+                    // Same shooting behavior as case 1
+                    if (!shootingActive && !shootingComplete) {
+                        follower.setMaxPowerScaling(1);
+                        shootStage = 0;
+                        ballsShot = 0;
+                        shootTimer = 0;
+                        openServo();
+                        shootBalls();
+                    } else if (shootingActive && !shootingComplete) {
+                        shootBalls();
+                    } else if (shootingComplete) {
+                        shootingComplete = false;
                         follower.followPath(paths.ToSecondSet);
                         // Close servo, Outtake off
                         stopOuttake();
@@ -349,6 +474,7 @@ public class PedroAutonomous extends OpMode {
             case 6:
                 if (!follower.isBusy()) {
                     // Turn intake on, keep servo closed
+                    follower.setMaxPowerScaling(.7);
                     startIntake();
                     closeServo();
                     follower.followPath(paths.IntakeSecondSet);
@@ -358,6 +484,7 @@ public class PedroAutonomous extends OpMode {
 
             case 7:
                 if (!follower.isBusy()) {
+                    follower.setMaxPowerScaling(1);
                     // Stop intake, keep outtake on, keep servo closed
                     closeServo();
                     startOuttake();
@@ -369,10 +496,18 @@ public class PedroAutonomous extends OpMode {
 
             case 8:
                 if (!follower.isBusy()) {
-                    // Fire the balls, Open servo, Intake on to push balls to outtake
-                    if (shootStep == 67) shootStep = 0;
-                    shootBalls();
-                    if (shootStep == 67) {
+                    // Same shooting behavior as case 1/5
+                    if (!shootingActive && !shootingComplete) {
+                        follower.setMaxPowerScaling(1);
+                        shootStage = 0;
+                        ballsShot = 0;
+                        shootTimer = 0;
+                        openServo();
+                        shootBalls();
+                    } else if (shootingActive && !shootingComplete) {
+                        shootBalls();
+                    } else if (shootingComplete) {
+                        shootingComplete = false;
                         follower.followPath(paths.ToThirdSet);
                         // Close Servo, turn off intake and outtake
                         closeServo();
@@ -387,7 +522,7 @@ public class PedroAutonomous extends OpMode {
                     // Keep servo closed, turn on intake
                     closeServo();
                     startIntake();
-                    stopIntake();
+                    stopOuttake();
                     follower.followPath(paths.IntakeSetThree);
                     pathState = 10;
                 }

@@ -67,7 +67,7 @@ public class TeleOpSingleLL extends OpMode {
         if (gamepad1.dpad_right) {
             servo.setPosition(0);
         } else if (gamepad1.dpad_left){
-            servo.setPosition(0.12);
+            servo.setPosition(0.15);
         }
 
         toggleAlliance();
