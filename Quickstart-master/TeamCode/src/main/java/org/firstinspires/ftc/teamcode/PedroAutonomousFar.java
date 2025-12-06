@@ -15,9 +15,9 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
-@Autonomous(name = "Pedro Auto MFITBILTPDSPOTBATBW", group = "Autonomous")
+@Autonomous(name = "Pedro Auto Far MFITBILTPDSPOTBATBW", group = "Autonomous")
 @Configurable // Panels
-public class PedroAutonomous extends OpMode {
+public class PedroAutonomousFar extends OpMode {
 
     private TelemetryManager panelsTelemetry; // Panels Telemetry instance
     public Follower follower; // Pedro Pathing follower instance
@@ -27,7 +27,7 @@ public class PedroAutonomous extends OpMode {
     private DcMotor intakeMotor;
     private Servo servo;
     private static final double TICKS_PER_REV = 28;
-    private static final double TARGET_RPM_LOW = 2650;
+    private static final double TARGET_RPM_LOW = 3450;
     private long shootTimer = 0;
     private int shootStage = 0;
     private int ballsShot = 0;
